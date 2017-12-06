@@ -16,7 +16,7 @@ void EMUTEST_fail(void);
 { \
   if(this != that) \
   { \
-    (void) printf("ASSERT FAILED: %s (%d) != %s (%d)\n", #this, this, #that, that); \
+    (void) printf("%s:%u - ASSERT FAILED: %s (%d) != %s (%d)\n", __FILE__, __LINE__, #this, this, #that, that); \
     EMUTEST_fail(); \
   } \
 } \

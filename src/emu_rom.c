@@ -1,4 +1,5 @@
 #include "emu_rom.h"
+#include "emu_debug.h"
 #include <stdio.h>
 
 EMUROM_Return EMUROM_read(char* romPath, char* romBuf, uint32_t* romSize)
@@ -6,6 +7,8 @@ EMUROM_Return EMUROM_read(char* romPath, char* romBuf, uint32_t* romSize)
   EMUROM_Return retVal = EMUROM_NOK;
 
   FILE* romFile = fopen(romPath, "rb");
+
+  EMU_DEBUG_ASSERT(romFile);
 
   if(romFile)
   {
