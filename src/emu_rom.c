@@ -8,7 +8,7 @@ EMUROM_Return EMUROM_read(char* romPath, char* romBuf, uint32_t* romSize)
 
   FILE* romFile = fopen(romPath, "rb");
 
-  EMU_DEBUG_ASSERT(romFile);
+  EMU_DEBUG_ASSERT_COND(romFile);
 
   if(romFile)
   {

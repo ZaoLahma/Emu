@@ -11,7 +11,11 @@ int main(void)
 
   EMUROM_test();
 
-  if(TEST_OK != EMUTEST_getResult())
+  if(TEST_OK == EMUTEST_getResult())
+  {
+    (void) printf("TEST SUCCEEDED\n");
+  }
+  else
   {
     (void) printf("TEST FAILED\n");
   }

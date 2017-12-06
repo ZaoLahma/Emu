@@ -20,7 +20,7 @@ void EMU_init(char* romPath)
 {
   emuCtxt.runTimeStatus = true;
   EMUCPU_init();
-  EMU_DEBUG_ASSERT(EMUROM_OK == EMUROM_read(romPath, emuCtxt.romBuf, &emuCtxt.romSize));
+  EMU_DEBUG_ASSERT_COND(EMUROM_OK == EMUROM_read(romPath, emuCtxt.romBuf, &emuCtxt.romSize));
 }
 
 void EMU_run(void)
