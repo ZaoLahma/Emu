@@ -19,13 +19,13 @@ static EMU_Context emuCtxt;
 void EMU_init(char* romPath)
 {
   emuCtxt.runTimeStatus = true;
-  EMUCPU_init();
   EMU_DEBUG_ASSERT_COND(EMUROM_OK == EMUROM_read(romPath, emuCtxt.romBuf, &emuCtxt.romSize));
+  EMUCPU_init();
 }
 
 void EMU_run(void)
 {
-  if(emuCtxt.runTimeStatus)
+  while(emuCtxt.runTimeStatus)
   {
     EMUCPU_run(emuCtxt.romBuf);
   }
@@ -34,5 +34,4 @@ void EMU_run(void)
 void EMU_abort(void)
 {
   emuCtxt.runTimeStatus = false;
-  EMUCPU_abort();
 }

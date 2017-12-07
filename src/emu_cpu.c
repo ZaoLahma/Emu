@@ -5,7 +5,7 @@
 
 static EMUCPU_Context cpuContext;
 
-void EMUCPU_init(void)
+void EMUCPU_init()
 {
   (void) memset(&cpuContext, 0, sizeof(cpuContext));
   cpuContext.sp = 255u;
@@ -14,11 +14,6 @@ void EMUCPU_init(void)
 void EMUCPU_run(char* prog)
 {
   EMU_DEBUG_ASSERT_COND(prog);
-}
-
-void EMUCPU_abort(void)
-{
-
 }
 
 void EMUCPU_getContext(struct EMUCPU_Context** context)

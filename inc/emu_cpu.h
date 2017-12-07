@@ -15,6 +15,5 @@ typedef struct
 
 void EMUCPU_init(void);
 void EMUCPU_run(char* prog);
-void EMUCPU_abort(void);
 
 #endif
