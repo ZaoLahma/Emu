@@ -1,6 +1,6 @@
-CCOMMAND = gcc
-CFLAGS = -Wall -c -Wextra -g
-LINKARGS = -lpthread
+CCOMMAND = clang
+CFLAGS = -Wall -c -Wextra -g --coverage
+LINKARGS = -lpthread --coverage
 SOURCES = $(wildcard src/*.c config/*.c)
 RELEASE_SOURCES = $(wildcard src/release/*.c)
 TEST_SOURCES = $(wildcard test/*.c)
@@ -13,6 +13,8 @@ RELEASE_EXE_NAME = gameboy
 
 $(TEST_EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(TEST_OBJECTS) $(LINKARGS) -o $(TEST_EXE_NAME)
+	./$(TEST_EXE_NAME)
+	gcov ./src/*.gcno
 
 $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(RELEASE_OBJECTS) $(LINKARGS) -o $(RELEASE_EXE_NAME)
@@ -22,3 +24,4 @@ $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 
 clean:
 	rm -f $(TEST_EXE_NAME) $(RELEASE_EXE_NAME) $(OBJECTS) $(TEST_OBJECTS) $(RELEASE_OBJECTS)
+	rm -f ./*.gc* ./src/*.gc* ./test/*.gc*
