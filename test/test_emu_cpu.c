@@ -6,6 +6,7 @@
 static EMUCPU_Context* cpuContext;
 
 static void EMUCPU_testInit(void);
+static void EMUCPU_testIllegalInstruction(void);
 static void EMUCPU_testLdSp(void);
 static void EMUCPU_testNop(void);
 
@@ -15,6 +16,16 @@ static void EMUCPU_testInit(void)
   TEST_ASSERT_INT_EQ(cpuContext->sp, 0xFFFFu);
   TEST_ASSERT_INT_EQ(cpuContext->pc, 0x0);
   TEST_ASSERT_INT_EQ(cpuContext->stateOk, true);
+}
+
+static void EMUCPU_testIllegalInstruction(void)
+{
+  EMUCPU_init();
+  uint8_t illegalInstruction[] = {0xFE};
+
+  EMUCPU_run(illegalInstruction);
+
+  TEST_ASSERT_UINT_EQ(cpuContext->stateOk, false);
 }
 
 static void EMUCPU_testLdSp(void)
@@ -42,6 +53,7 @@ void EMUCPU_test(void)
 {
   EMUCPU_getContext((struct EMUCPU_Context**)&cpuContext);
   EMUCPU_testInit();
+  EMUCPU_testIllegalInstruction();
   EMUCPU_testLdSp();
   EMUCPU_testNop();
 }
