@@ -1,2 +1,2 @@
 # NesEmu
-A NES emulator project to have something to focus on
+An emulator project to have something to focus on. Currently focusing on the Nintendo Gameboy.

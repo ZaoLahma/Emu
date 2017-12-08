@@ -10,7 +10,7 @@ static void EMUCPU_testInit(void);
 static void EMUCPU_testInit(void)
 {
   EMUCPU_init();
-  TEST_ASSERT_INT_EQ(cpuContext->sp, 255u);
+  TEST_ASSERT_INT_EQ(cpuContext->sp, 0xFFFFu);
 }
 
 void EMUCPU_test(void)
