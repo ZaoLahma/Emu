@@ -13,22 +13,22 @@
   arg = arg; \
 } \
 
-typedef void (*EMUCPU_InstructionHandler)(EMUCPU_Context* cpu, char* rom);
+typedef void (*EMUCPU_InstructionHandler)(EMUCPU_Context* cpu, uint8_t* rom);
 
 typedef struct
 {
   EMUCPU_InstructionHandler handle;
 } EMUCPU_Instruction;
 
-static void illegalInstruction(EMUCPU_Context* cpu, char* rom);
-static void handleNop(EMUCPU_Context* cpu, char* rom);
-static void handleLdSp(EMUCPU_Context* cpu, char* rom);
+static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleNop(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom);
 
 static uint8_t stack[STACK_SIZE];
 static EMUCPU_Context cpu;
 static EMUCPU_Instruction instructionTable[NUM_INSTRUCTIONS];
 
-static void illegalInstruction(EMUCPU_Context* cpu, char* rom)
+static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom)
 {
   uint8_t op = rom[cpu->pc];
   (void) printf("illegal instruction 0x%x at 0x%x\n", op, cpu->pc);
@@ -37,13 +37,13 @@ static void illegalInstruction(EMUCPU_Context* cpu, char* rom)
   cpu->stateOk = false;
 }
 
-static void handleNop(EMUCPU_Context* cpu, char* rom)
+static void handleNop(EMUCPU_Context* cpu, uint8_t* rom)
 {
   UNUSED_ARG(rom);
   cpu->pc += 1u;
 }
 
-static void handleLdSp(EMUCPU_Context* cpu, char* rom)
+static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom)
 {
   cpu->sp = rom[cpu->pc + 2u] << 8u | rom[cpu->pc + 1u];
   cpu->pc += 3u;
@@ -65,7 +65,7 @@ void EMUCPU_init()
   instructionTable[0x31].handle = handleLdSp;
 }
 
-void EMUCPU_run(char* prog)
+void EMUCPU_run(uint8_t* prog)
 {
   EMU_DEBUG_ASSERT_COND(prog);
   uint8_t op = prog[cpu.pc];

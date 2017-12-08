@@ -21,4 +21,13 @@ void EMUTEST_fail(void);
   } \
 } \
 
+#define TEST_ASSERT_UINT_EQ(this, that) \
+{ \
+  if(this != that) \
+  { \
+    (void) printf("%s:%u - ASSERT FAILED: %s (%u) != %s (%u)\n", __FILE__, __LINE__, #this, this, #that, that); \
+    EMUTEST_fail(); \
+  } \
+} \
+
 #endif

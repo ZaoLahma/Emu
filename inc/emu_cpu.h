@@ -20,6 +20,6 @@ typedef struct
 } EMUCPU_Context;
 
 void EMUCPU_init(void);
-void EMUCPU_run(char* prog);
+void EMUCPU_run(uint8_t* prog);
 
 #endif
