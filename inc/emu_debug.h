@@ -4,6 +4,15 @@
 #include "emu.h"
 #include <stdio.h>
 
+#ifdef DEBUG
+#define DEBUG_LOG(stringPattern, ...) \
+{\
+  (void) printf(stringPattern "\n", __VA_ARGS__); \
+}
+#else
+#define DEBUG_LOG(stringPattern, ...) 
+#endif
+
 #define EMU_DEBUG_ASSERT_COND(cond) \
 { \
   if(!(cond)) \

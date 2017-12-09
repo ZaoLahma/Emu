@@ -11,6 +11,7 @@ INC_DIRS = -I./inc -I./config
 TEST_EXE_NAME = test_gameboy
 RELEASE_EXE_NAME = gameboy
 
+$(TEST_EXE_NAME): CFLAGS += -DDEBUG
 $(TEST_EXE_NAME): CFLAGS += --coverage
 $(TEST_EXE_NAME): LINKARGS += --coverage
 $(TEST_EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
