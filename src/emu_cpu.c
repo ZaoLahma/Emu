@@ -63,6 +63,7 @@ void EMUCPU_init()
   (void) memset(&cpu, 0, sizeof(cpu));
   cpu.sp = STACK_SIZE - 1u;
   cpu.pc = 0u;
+  cpu.flags = 0u;
   cpu.stateOk = true;
 
   for(uint32_t i = 0; i < NUM_INSTRUCTIONS; ++i)

@@ -16,6 +16,7 @@ typedef struct
   uint8_t  e;
   uint8_t  h;
   uint8_t  l;
+  uint8_t  flags;
   bool     stateOk;
 } EMUCPU_Context;
 

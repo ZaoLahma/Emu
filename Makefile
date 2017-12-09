@@ -17,7 +17,8 @@ $(TEST_EXE_NAME): LINKARGS += --coverage
 $(TEST_EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(TEST_OBJECTS) $(LINKARGS) -o $(TEST_EXE_NAME)
 	./$(TEST_EXE_NAME)
-	gcov ./src/*.gcno > coverage.txt
+	@gcov ./src/*.gcno > coverage.txt || true
+	@make -s clean || true
 
 $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(RELEASE_OBJECTS) $(LINKARGS) -o $(RELEASE_EXE_NAME)
