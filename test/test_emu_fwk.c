@@ -11,7 +11,7 @@ EMUTEST_Result EMUTEST_getResult(void)
     overallResult = caseResult;
   }
   caseResult = TEST_OK;
-  return caseResult;
+  return retVal;
 }
 
 EMUTEST_Result EMUTEST_getOverallResult(void)
