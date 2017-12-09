@@ -10,7 +10,29 @@ typedef enum
 } EMUTEST_Result;
 
 EMUTEST_Result EMUTEST_getResult(void);
+EMUTEST_Result EMUTEST_getOverallResult(void);
 void EMUTEST_fail(void);
+
+#define TEST_SUITE(testSuiteFunc) \
+{ \
+  (void) printf("\nRUNNING SUITE %s\n", #testSuiteFunc); \
+  testSuiteFunc(); \
+  (void) printf("\n-------------- \n"); \
+} \
+
+#define TEST_CASE(testFunc) \
+{ \
+  (void) printf("\nRUNNING TEST CASE %s\n", #testFunc); \
+  testFunc(); \
+  if(TEST_OK != EMUTEST_getResult()) \
+  { \
+    (void) printf("TEST CASE %s FAILED\n", #testFunc); \
+  } \
+  else \
+  { \
+    (void) printf("TEST %s SUCCEEDED \n", #testFunc); \
+  } \
+} \
 
 #define TEST_ASSERT_INT_EQ(this, that) \
 { \

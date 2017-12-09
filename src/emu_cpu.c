@@ -69,7 +69,6 @@ void EMUCPU_run(uint8_t* prog)
 {
   EMU_DEBUG_ASSERT_COND(prog);
   uint8_t op = prog[cpu.pc];
-  (void) printf("op: %u\n", op);
   instructionTable[op].handle(&cpu, prog);
   EMU_DEBUG_ASSERT_COND(cpu.stateOk);
 }

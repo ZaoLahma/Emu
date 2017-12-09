@@ -1,13 +1,25 @@
 #include "test_emu_fwk.h"
 
-static EMUTEST_Result result = TEST_OK;
+static EMUTEST_Result caseResult = TEST_OK;
+static EMUTEST_Result overallResult = TEST_OK;
 
 EMUTEST_Result EMUTEST_getResult(void)
 {
-  return result;
+  EMUTEST_Result retVal = caseResult;
+  if(TEST_OK != caseResult)
+  {
+    overallResult = caseResult;
+  }
+  caseResult = TEST_OK;
+  return caseResult;
+}
+
+EMUTEST_Result EMUTEST_getOverallResult(void)
+{
+  return overallResult;
 }
 
 void EMUTEST_fail(void)
 {
-  result = TEST_NOK;
+  caseResult = TEST_NOK;
 }

@@ -6,18 +6,16 @@
 
 int main(void)
 {
+  TEST_SUITE(EMUROM_test);
+  TEST_SUITE(EMUCPU_test);
 
-  EMUROM_test();
-  EMUCPU_test();
-
-  if(TEST_OK == EMUTEST_getResult())
+  if(TEST_OK == EMUTEST_getOverallResult())
   {
-    (void) printf("TEST SUCCEEDED\n");
+    (void) printf("TEST EXECUTION SUCCEEDED\n");
   }
   else
   {
-    (void) printf("TEST FAILED\n");
+    (void) printf("TEST EXECUTION FAILED\n");
   }
-
   return 0;
 }

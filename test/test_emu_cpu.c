@@ -52,8 +52,8 @@ static void EMUCPU_testNop(void)
 void EMUCPU_test(void)
 {
   EMUCPU_getContext((struct EMUCPU_Context**)&cpuContext);
-  EMUCPU_testInit();
-  EMUCPU_testIllegalInstruction();
-  EMUCPU_testLdSp();
-  EMUCPU_testNop();
+  TEST_CASE(EMUCPU_testInit);
+  TEST_CASE(EMUCPU_testIllegalInstruction);
+  TEST_CASE(EMUCPU_testLdSp);
+  TEST_CASE(EMUCPU_testNop);
 }

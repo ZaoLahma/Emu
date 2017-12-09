@@ -30,6 +30,6 @@ static void EMUROM_testFileReadNok(void)
 
 void EMUROM_test(void)
 {
-  EMUROM_testFileReadOk();
-  EMUROM_testFileReadNok();
+  TEST_CASE(EMUROM_testFileReadOk);
+  TEST_CASE(EMUROM_testFileReadNok);
 }

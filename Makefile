@@ -1,6 +1,6 @@
 CCOMMAND = clang
-CFLAGS = -Wall -c -Wextra -g --coverage
-LINKARGS = -lpthread --coverage
+CFLAGS = -Wall -c -Wextra -g
+LINKARGS = -lpthread
 SOURCES = $(wildcard src/*.c config/*.c)
 RELEASE_SOURCES = $(wildcard src/release/*.c)
 TEST_SOURCES = $(wildcard test/*.c)
@@ -11,10 +11,12 @@ INC_DIRS = -I./inc -I./config
 TEST_EXE_NAME = test_gameboy
 RELEASE_EXE_NAME = gameboy
 
+$(TEST_EXE_NAME): CFLAGS += --coverage
+$(TEST_EXE_NAME): LINKARGS += --coverage
 $(TEST_EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(TEST_OBJECTS) $(LINKARGS) -o $(TEST_EXE_NAME)
 	./$(TEST_EXE_NAME)
-	gcov ./src/*.gcno
+	gcov ./src/*.gcno > coverage.txt
 
 $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(RELEASE_OBJECTS) $(LINKARGS) -o $(RELEASE_EXE_NAME)
