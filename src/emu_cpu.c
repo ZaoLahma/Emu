@@ -2,7 +2,6 @@
 #include "emu_debug.h"
 #include "../test/test_emu_cpu.h"
 #include <string.h>
-#include <stdbool.h>
 #include <stdio.h>
 
 #define NUM_INSTRUCTIONS (0xFF)
