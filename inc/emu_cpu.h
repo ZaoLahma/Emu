@@ -4,6 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define EMUCPU_NUM_FLAGS          (4u)
+#define EMUCPU_ZERO_FLAG          (0u)
+#define EMUCPU_CARRY_FLAG         (1u)
+#define EMUCPU_HALF_CARRY_FLAG    (2u)
+#define EMUCPU_SUBTRACT_FLAG      (3u)
+
+
 typedef struct
 {
   uint64_t cycles;
@@ -16,7 +23,7 @@ typedef struct
   uint8_t  e;
   uint8_t  h;
   uint8_t  l;
-  uint8_t  flags;
+  uint8_t  flags[EMUCPU_NUM_FLAGS];
   bool     stateOk;
 } EMUCPU_Context;
 

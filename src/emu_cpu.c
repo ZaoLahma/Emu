@@ -24,6 +24,8 @@ static uint16_t read16BitWord(uint8_t* buf);
 static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom);
 static void handleNop(EMUCPU_Context* cpu, uint8_t* rom);
 static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleXor(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom);
 
 static uint8_t stack[STACK_SIZE];
 static EMUCPU_Context cpu;
@@ -57,12 +59,39 @@ static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom)
   cpu->pc += 3u;
 }
 
+static void handleXor(EMUCPU_Context* cpu, uint8_t* rom)
+{
+  uint8_t op = rom[cpu->pc];
+  uint8_t data = 0u;
+  switch(op)
+  {
+    case 0xAF:
+      data = cpu->a;
+      DEBUG_LOG("cpu->a: %u", cpu->a);
+      cpu->flags[EMUCPU_SUBTRACT_FLAG]   = 0u;
+      cpu->flags[EMUCPU_CARRY_FLAG]      = 0u;
+      cpu->flags[EMUCPU_HALF_CARRY_FLAG] = 0u;
+      break;
+    default:
+      DEBUG_LOG("Xor with 0x%X not implemented", op);
+      break;
+  }
+  cpu->a ^= data;
+  DEBUG_LOG("Data: %u, cpu->a: %u", data, cpu->a);
+  cpu->pc += 1u;
+}
+
+static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom)
+{
+  handleXor(cpu, rom);
+  cpu->flags[EMUCPU_ZERO_FLAG] = (cpu->a == 0u);
+}
+
 void EMUCPU_init()
 {
   (void) memset(&cpu, 0, sizeof(cpu));
   cpu.sp = STACK_SIZE - 1u;
   cpu.pc = 0u;
-  cpu.flags = 0u;
   cpu.stateOk = true;
 
   for(uint32_t i = 0; i < NUM_INSTRUCTIONS; ++i)
@@ -72,6 +101,7 @@ void EMUCPU_init()
 
   instructionTable[0x0].handle = handleNop;
   instructionTable[0x31].handle = handleLdSp;
+  instructionTable[0xAF].handle = handleXorA;
 }
 
 void EMUCPU_run(uint8_t* prog)
