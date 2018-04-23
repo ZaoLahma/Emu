@@ -2,6 +2,7 @@
 #include "emu_cpu.h"
 #include "emu_rom.h"
 #include "emu_debug.h"
+#include "emu_window.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -21,12 +22,14 @@ void EMU_init(char* romPath)
   emuCtxt.runTimeStatus = true;
   EMU_DEBUG_ASSERT_COND(EMUROM_OK == EMUROM_read(romPath, emuCtxt.romBuf, &emuCtxt.romSize));
   EMUCPU_init();
+  EMUWIN_init();
 }
 
 void EMU_run(void)
 {
   while(emuCtxt.runTimeStatus)
   {
+    EMUWIN_run();
     EMUCPU_run(emuCtxt.romBuf);
   }
 }
