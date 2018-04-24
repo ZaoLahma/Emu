@@ -10,6 +10,7 @@ static void EMUCPU_testIllegalInstruction(void);
 static void EMUCPU_testLdSp(void);
 static void EMUCPU_testNop(void);
 static void EMUCPU_testXorA(void);
+static void EMUCPU_testLdHL(void);
 
 static void EMUCPU_testInit(void)
 {
@@ -79,6 +80,21 @@ static void EMUCPU_testXorA(void)
   TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], expectedFlagVal);
 }
 
+static void EMUCPU_testLdHL(void)
+{
+  EMUCPU_init();
+
+  uint8_t ldHL[] = {0x21, 0x30, 0x50};
+
+  uint8_t expectedH = 0x50;
+  uint8_t expectedL = 0x30;
+
+  EMUCPU_run(ldHL);
+
+  TEST_ASSERT_UINT_EQ(cpuContext->h, expectedH);
+  TEST_ASSERT_UINT_EQ(cpuContext->l, expectedL);
+}
+
 void EMUCPU_test(void)
 {
   EMUCPU_getContext((struct EMUCPU_Context**)&cpuContext);
@@ -87,4 +103,5 @@ void EMUCPU_test(void)
   TEST_CASE(EMUCPU_testLdSp);
   TEST_CASE(EMUCPU_testNop);
   TEST_CASE(EMUCPU_testXorA);
+  TEST_CASE(EMUCPU_testLdHL);
 }

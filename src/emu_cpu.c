@@ -4,8 +4,11 @@
 #include <string.h>
 #include <stdio.h>
 
-#define NUM_INSTRUCTIONS (0xFF)
-#define STACK_SIZE       (0xFFFFu)
+#define NUM_INSTRUCTIONS      (0xFF)
+#define STACK_SIZE            (0xFFFFu)
+#define UINT16_HIGH_BYTE_MASK (0xFF00u)
+#define UINT16_LOW_BYTE_MASK  (0x00FFu)
+#define BITS_IN_BYTE          (8u)
 
 #define UNUSED_ARG(arg) \
 {\
@@ -21,11 +24,13 @@ typedef struct
 
 static uint16_t read16BitWord(uint8_t* buf);
 
+static void handleXor(EMUCPU_Context* cpu, uint8_t* rom);
+
 static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom);
 static void handleNop(EMUCPU_Context* cpu, uint8_t* rom);
 static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom);
-static void handleXor(EMUCPU_Context* cpu, uint8_t* rom);
 static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleLdHL(EMUCPU_Context* cpu, uint8_t* rom);
 
 static uint8_t stack[STACK_SIZE];
 static EMUCPU_Context cpu;
@@ -87,6 +92,13 @@ static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom)
   cpu->flags[EMUCPU_ZERO_FLAG] = (cpu->a == 0u);
 }
 
+static void handleLdHL(EMUCPU_Context* cpu, uint8_t* rom)
+{
+  uint16_t val = read16BitWord(&rom[cpu->pc + 1u]);
+  cpu->h = (uint8_t)((val & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
+  cpu->l = (uint8_t)(val & UINT16_LOW_BYTE_MASK);
+}
+
 void EMUCPU_init()
 {
   (void) memset(&cpu, 0, sizeof(cpu));
@@ -100,6 +112,7 @@ void EMUCPU_init()
   }
 
   instructionTable[0x0].handle = handleNop;
+  instructionTable[0x21].handle = handleLdHL;
   instructionTable[0x31].handle = handleLdSp;
   instructionTable[0xAF].handle = handleXorA;
 }
