@@ -47,7 +47,7 @@ static EMUCPU_Instruction cbInstructionTable[NUM_INSTRUCTIONS];
 static uint16_t read16BitWord(uint8_t* buf)
 {
   uint16_t retVal = buf[1u] << 8u | buf[0u];
-  DEBUG_LOG("retVal: 0x%X", retVal);
+  DEBUG_LOG_PRINTF("retVal: 0x%X", retVal);
   return (retVal);
 }
 
@@ -78,17 +78,17 @@ static void handleXor(EMUCPU_Context* cpu)
   {
     case 0xAF:
       data = cpu->a;
-      DEBUG_LOG("cpu->a: %u", cpu->a);
+      DEBUG_LOG_PRINTF("cpu->a: %u", cpu->a);
       cpu->flags[EMUCPU_SUBTRACT_FLAG]   = 0u;
       cpu->flags[EMUCPU_CARRY_FLAG]      = 0u;
       cpu->flags[EMUCPU_HALF_CARRY_FLAG] = 0u;
       break;
     default:
-      DEBUG_LOG("Xor with 0x%X not implemented", op);
+      DEBUG_LOG_PRINTF("Xor with 0x%X not implemented", op);
       break;
   }
   cpu->a ^= data;
-  DEBUG_LOG("Data: %u, cpu->a: %u", data, cpu->a);
+  DEBUG_LOG_PRINTF("Data: %u, cpu->a: %u", data, cpu->a);
   cpu->pc += 1u;
 }
 
@@ -109,7 +109,7 @@ static void handleLdHL(EMUCPU_Context* cpu)
 static void handleLdDHLA(EMUCPU_Context* cpu)
 {
   uint16_t ramAddress = ((cpu->h << BITS_IN_BYTE) | cpu->l);
-  DEBUG_LOG("ramAddress: 0x%X", ramAddress);
+  DEBUG_LOG_PRINTF("ramAddress: 0x%X", ramAddress);
   cpu->ram[ramAddress] = cpu->a;
   ramAddress -= 1u;
   cpu->h = (uint8_t)((ramAddress & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
@@ -171,7 +171,7 @@ void EMUCPU_init(uint8_t* prog, uint16_t size)
 void EMUCPU_run()
 {
   uint8_t op = cpu.ram[cpu.pc];
-  DEBUG_LOG("CPU handling op: 0x%X at address: 0x%x", op, cpu.pc);
+  DEBUG_LOG_PRINTF("CPU handling op: 0x%X at address: 0x%x", op, cpu.pc);
   instructionTable[op].handle(&cpu);
   EMU_DEBUG_ASSERT_COND(cpu.stateOk);
 }

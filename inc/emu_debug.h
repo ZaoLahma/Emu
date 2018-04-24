@@ -5,12 +5,16 @@
 #include <stdio.h>
 
 #ifdef DEBUG
-#define DEBUG_LOG(stringPattern, ...) \
+#define DEBUG_LOG(string) \
+{\
+  (void) printf(string "\n"); \
+}
+#define DEBUG_LOG_PRINTF(stringPattern, ...) \
 {\
   (void) printf(stringPattern "\n", __VA_ARGS__); \
 }
 #else
-#define DEBUG_LOG(stringPattern, ...) 
+#define DEBUG_LOG_PRINTF(stringPattern, ...)
 #endif
 
 #define EMU_DEBUG_ASSERT_COND(cond) \
