@@ -35,9 +35,11 @@ void EMUDEBUGGER_run(EMUCPU_Context* cpu)
     {
       int32_t command;
 
-      while((command = getchar()) != EOF)
+      while((command = getchar()) != EOF &&
+             context.commandIndex < MAX_COMMAND_LENGTH)
       {
-
+        context.command[context.commandIndex] = (uint8_t)command;
+        context.commandIndex += 1u;
       }
     }
   }

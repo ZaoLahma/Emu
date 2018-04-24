@@ -9,6 +9,6 @@ typedef enum
   EMUROM_NOK
 } EMUROM_Return;
 
-EMUROM_Return EMUROM_read(char* romPath, uint8_t* romBuf, uint32_t* romSize);
+EMUROM_Return EMUROM_read(char* romPath, uint8_t* romBuf, uint16_t* romSize);
 
 #endif

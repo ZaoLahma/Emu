@@ -11,7 +11,7 @@
 typedef struct
 {
   uint8_t  romBuf[MAX_ROM_BYTE_SIZE];
-  uint32_t romSize;
+  uint16_t romSize;
   bool     runTimeStatus;
 } EMU_Context;
 
