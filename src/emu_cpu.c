@@ -10,12 +10,14 @@
 #define UINT16_LOW_BYTE_MASK  (0x00FFu)
 #define BITS_IN_BYTE          (8u)
 
+#define BIT_7                 (7u)
+
 #define UNUSED_ARG(arg) \
 {\
   arg = arg; \
 } \
 
-typedef void (*EMUCPU_InstructionHandler)(EMUCPU_Context* cpu, uint8_t* rom);
+typedef void (*EMUCPU_InstructionHandler)(EMUCPU_Context* cpu);
 
 typedef struct
 {
@@ -24,17 +26,22 @@ typedef struct
 
 static uint16_t read16BitWord(uint8_t* buf);
 
-static void handleXor(EMUCPU_Context* cpu, uint8_t* rom);
+static void handleXor(EMUCPU_Context* cpu);
 
-static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom);
-static void handleNop(EMUCPU_Context* cpu, uint8_t* rom);
-static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom);
-static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom);
-static void handleLdHL(EMUCPU_Context* cpu, uint8_t* rom);
+static void illegalInstruction(EMUCPU_Context* cpu);
+static void handleNop(EMUCPU_Context* cpu);
+static void handleLdSp(EMUCPU_Context* cpu);
+static void handleXorA(EMUCPU_Context* cpu);
+static void handleLdHL(EMUCPU_Context* cpu);
+static void handleLdDHLA(EMUCPU_Context* cpu);
+static void handleCb(EMUCPU_Context* cpu);
+
+static void handleCbBit7H(EMUCPU_Context* cpu);
 
 static uint8_t stack[STACK_SIZE];
 static EMUCPU_Context cpu;
 static EMUCPU_Instruction instructionTable[NUM_INSTRUCTIONS];
+static EMUCPU_Instruction cbInstructionTable[NUM_INSTRUCTIONS];
 
 static uint16_t read16BitWord(uint8_t* buf)
 {
@@ -43,30 +50,28 @@ static uint16_t read16BitWord(uint8_t* buf)
   return (retVal);
 }
 
-static void illegalInstruction(EMUCPU_Context* cpu, uint8_t* rom)
+static void illegalInstruction(EMUCPU_Context* cpu)
 {
-  uint8_t op = rom[cpu->pc];
+  uint8_t op = cpu->ram[cpu->pc];
   (void) printf("illegal instruction 0x%X at 0x%X\n", op, cpu->pc);
   UNUSED_ARG(cpu);
-  UNUSED_ARG(rom);
   cpu->stateOk = false;
 }
 
-static void handleNop(EMUCPU_Context* cpu, uint8_t* rom)
+static void handleNop(EMUCPU_Context* cpu)
 {
-  UNUSED_ARG(rom);
   cpu->pc += 1u;
 }
 
-static void handleLdSp(EMUCPU_Context* cpu, uint8_t* rom)
+static void handleLdSp(EMUCPU_Context* cpu)
 {
-  cpu->sp = read16BitWord(&rom[cpu->pc + 1u]);
+  cpu->sp = read16BitWord(&cpu->ram[cpu->pc + 1u]);
   cpu->pc += 3u;
 }
 
-static void handleXor(EMUCPU_Context* cpu, uint8_t* rom)
+static void handleXor(EMUCPU_Context* cpu)
 {
-  uint8_t op = rom[cpu->pc];
+  uint8_t op = cpu->ram[cpu->pc];
   uint8_t data = 0u;
   switch(op)
   {
@@ -86,22 +91,52 @@ static void handleXor(EMUCPU_Context* cpu, uint8_t* rom)
   cpu->pc += 1u;
 }
 
-static void handleXorA(EMUCPU_Context* cpu, uint8_t* rom)
+static void handleXorA(EMUCPU_Context* cpu)
 {
-  handleXor(cpu, rom);
+  handleXor(cpu);
   cpu->flags[EMUCPU_ZERO_FLAG] = (cpu->a == 0u);
 }
 
-static void handleLdHL(EMUCPU_Context* cpu, uint8_t* rom)
+static void handleLdHL(EMUCPU_Context* cpu)
 {
-  uint16_t val = read16BitWord(&rom[cpu->pc + 1u]);
+  uint16_t val = read16BitWord(&cpu->ram[cpu->pc + 1u]);
   cpu->h = (uint8_t)((val & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
   cpu->l = (uint8_t)(val & UINT16_LOW_BYTE_MASK);
+  cpu->pc += 3u;
 }
 
-void EMUCPU_init()
+static void handleLdDHLA(EMUCPU_Context* cpu)
 {
+  uint16_t ramAddress = (cpu->h << BITS_IN_BYTE) | cpu->l;
+  DEBUG_LOG("ramAddress: 0x%x", ramAddress);
+  cpu->ram[ramAddress] = cpu->a;
+  ramAddress -= 1u;
+  cpu->h = (uint8_t)((ramAddress & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
+  cpu->l = (uint8_t)(ramAddress & UINT16_LOW_BYTE_MASK);
+  cpu->pc += 1u;
+}
+
+static void handleCb(EMUCPU_Context* cpu)
+{
+  cpu->pc += 1u;
+  uint8_t cbOp = cpu->ram[cpu->pc];
+  cbInstructionTable[cbOp].handle(cpu);
+}
+
+static void handleCbBit7H(EMUCPU_Context* cpu)
+{
+  uint8_t bit7 = ((cpu->h >> BIT_7) & 1u);
+  cpu->flags[EMUCPU_ZERO_FLAG] = bit7;
+
+  cpu->pc += 1u;
+}
+
+void EMUCPU_init(uint8_t* prog, uint16_t size)
+{
+  EMU_DEBUG_ASSERT_COND(prog);
   (void) memset(&cpu, 0, sizeof(cpu));
+  (void) memcpy(&cpu.ram[0u], prog, size);
+
   cpu.sp = STACK_SIZE - 1u;
   cpu.pc = 0u;
   cpu.stateOk = true;
@@ -109,20 +144,24 @@ void EMUCPU_init()
   for(uint32_t i = 0; i < NUM_INSTRUCTIONS; ++i)
   {
     instructionTable[i].handle = illegalInstruction;
+    cbInstructionTable[i].handle = illegalInstruction;
   }
 
   instructionTable[0x0].handle = handleNop;
   instructionTable[0x21].handle = handleLdHL;
   instructionTable[0x31].handle = handleLdSp;
+  instructionTable[0x32].handle = handleLdDHLA;
   instructionTable[0xAF].handle = handleXorA;
+  instructionTable[0xCB].handle = handleCb;
+
+  cbInstructionTable[0x7C].handle = handleCbBit7H;
 }
 
-void EMUCPU_run(uint8_t* prog)
+void EMUCPU_run()
 {
-  EMU_DEBUG_ASSERT_COND(prog);
-  uint8_t op = prog[cpu.pc];
+  uint8_t op = cpu.ram[cpu.pc];
   DEBUG_LOG("CPU handling op: 0x%X", op);
-  instructionTable[op].handle(&cpu, prog);
+  instructionTable[op].handle(&cpu);
   EMU_DEBUG_ASSERT_COND(cpu.stateOk);
 }
 

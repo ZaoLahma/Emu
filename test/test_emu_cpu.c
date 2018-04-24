@@ -14,7 +14,10 @@ static void EMUCPU_testLdHL(void);
 
 static void EMUCPU_testInit(void)
 {
-  EMUCPU_init();
+  uint8_t nop[] = {0x0};
+
+  EMUCPU_init(nop, sizeof(nop));
+  
   TEST_ASSERT_INT_EQ(cpuContext->sp, 0xFFFEu);
   TEST_ASSERT_INT_EQ(cpuContext->pc, 0x0);
   TEST_ASSERT_INT_EQ(cpuContext->stateOk, true);
@@ -22,20 +25,22 @@ static void EMUCPU_testInit(void)
 
 static void EMUCPU_testIllegalInstruction(void)
 {
-  EMUCPU_init();
   uint8_t illegalInstruction[] = {0xFE};
 
-  EMUCPU_run(illegalInstruction);
+  EMUCPU_init(illegalInstruction, sizeof(illegalInstruction));
+
+  EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->stateOk, false);
 }
 
 static void EMUCPU_testLdSp(void)
 {
-  EMUCPU_init();
   uint8_t ldsp[] = {0x31, 0xFE, 0xFF};
 
-  EMUCPU_run(ldsp);
+  EMUCPU_init(ldsp, sizeof(ldsp));
+
+  EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->pc, 3u);
   TEST_ASSERT_UINT_EQ(cpuContext->sp, 0XFFFE);
@@ -43,31 +48,32 @@ static void EMUCPU_testLdSp(void)
 
 static void EMUCPU_testNop(void)
 {
-  EMUCPU_init();
   uint8_t nop[] = {0x0};
 
-  EMUCPU_run(nop);
+  EMUCPU_init(nop, sizeof(nop));
+
+  EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->pc, 1u);
 }
 
 static void EMUCPU_testXorA(void)
 {
-  EMUCPU_init();
-
   uint8_t xorA[] = {0xAF};
+
+  EMUCPU_init(xorA, sizeof(xorA));
 
   uint8_t expectedRegVal = 0u;
   uint8_t expectedFlagVal = 1u;
 
   cpuContext->a = 0u;
 
-  EMUCPU_run(xorA);
+  EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->a, expectedRegVal);
   TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], expectedFlagVal);
 
-  EMUCPU_init();
+  cpuContext->pc = 0u;
 
   expectedRegVal = 0u;
   expectedFlagVal = 1u;
@@ -82,14 +88,14 @@ static void EMUCPU_testXorA(void)
 
 static void EMUCPU_testLdHL(void)
 {
-  EMUCPU_init();
-
   uint8_t ldHL[] = {0x21, 0x30, 0x50};
+
+  EMUCPU_init(ldHL, sizeof(ldHL));
 
   uint8_t expectedH = 0x50;
   uint8_t expectedL = 0x30;
 
-  EMUCPU_run(ldHL);
+  EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->h, expectedH);
   TEST_ASSERT_UINT_EQ(cpuContext->l, expectedL);

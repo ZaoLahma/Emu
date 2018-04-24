@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define EMUCPU_RAM_SIZE           (0x10000u)
+
 #define EMUCPU_NUM_FLAGS          (4u)
 #define EMUCPU_ZERO_FLAG          (0u)
 #define EMUCPU_CARRY_FLAG         (1u)
@@ -13,6 +15,7 @@
 
 typedef struct
 {
+  uint8_t ram[EMUCPU_RAM_SIZE];
   uint64_t cycles;
   uint16_t sp;
   uint16_t pc;
@@ -27,7 +30,7 @@ typedef struct
   bool     stateOk;
 } EMUCPU_Context;
 
-void EMUCPU_init(void);
-void EMUCPU_run(uint8_t* prog);
+void EMUCPU_init(uint8_t* prog, uint16_t size);
+void EMUCPU_run();
 
 #endif
