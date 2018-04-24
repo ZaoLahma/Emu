@@ -8,6 +8,8 @@
 
 #define NO_BREAKPOINT       (0xFFFFu)
 #define MAX_COMMAND_LENGTH  (50u)
+#define BREAKPOINT_CMD      "bp"
+#define RUN_CMD             "r"
 
 typedef struct
 {
@@ -22,6 +24,7 @@ typedef struct
 static EMUDEBUGGER_context context;
 
 static void showMenu(void);
+static void parseCommand(void);
 
 static void showMenu(void)
 {
@@ -30,11 +33,21 @@ static void showMenu(void)
   DEBUG_LOG("Run           : r")
 }
 
+void parseCommand(void)
+{
+  if(0u == memcmp(context.command, BREAKPOINT_CMD, strlen(BREAKPOINT_CMD)))
+  {
+    DEBUG_LOG("bp found");
+    context.stop = false;
+  }
+}
+
 void EMUDEBUGGER_init(void)
 {
   (void) memset(&context, 0u, sizeof(context));
   context.breakpoint = NO_BREAKPOINT;
   context.stop = true;
+  context.active = false;
   EMUCPU_getContext((struct EMUCPU_Context**)&context.cpuContext);
 }
 
@@ -51,16 +64,22 @@ void EMUDEBUGGER_run()
 
     while(context.stop)
     {
+      (void) memset(context.command, 0u, sizeof(context.command));
+
       showMenu();
 
       int32_t command;
 
-      while((command = getchar()) != EOF &&
-             context.commandIndex < MAX_COMMAND_LENGTH)
+      while((command = getchar()) != '\n' &&
+             context.commandIndex < MAX_COMMAND_LENGTH - 1u)
       {
         context.command[context.commandIndex] = (uint8_t)command;
         context.commandIndex += 1u;
       }
+      context.command[context.commandIndex] = '\0';
+      context.commandIndex += 1u;
+
+      parseCommand();
     }
   }
 }

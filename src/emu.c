@@ -3,6 +3,7 @@
 #include "emu_rom.h"
 #include "emu_debug.h"
 #include "emu_window.h"
+#include "emu_debugger.h"
 #include <stdint.h>
 #include <stdbool.h>
 

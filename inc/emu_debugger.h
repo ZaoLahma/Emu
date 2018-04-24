@@ -4,6 +4,6 @@
 #include "emu_cpu.h"
 
 void EMUDEBUGGER_init(void);
-void EMUDEBUGGER_run(EMUCPU_Context* cpu);
+void EMUDEBUGGER_run(void);
 
 #endif
