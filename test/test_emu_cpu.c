@@ -12,6 +12,7 @@ static void EMUCPU_testNop(void);
 static void EMUCPU_testXorA(void);
 static void EMUCPU_testLdHL(void);
 static void EMUCPU_testCbBit7H(void);
+static void EMUCPU_testJRNZ(void);
 
 static void EMUCPU_testInit(void)
 {
@@ -122,6 +123,26 @@ static void EMUCPU_testCbBit7H(void)
   TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], 0u);
 }
 
+static void EMUCPU_testJRNZ(void)
+{
+  uint8_t jRNZ[] = {0x20, 0x1, 0x0, 0x0};
+
+  EMUCPU_init(jRNZ, sizeof(jRNZ));
+
+  cpuContext->flags[EMUCPU_ZERO_FLAG] = 0u;
+
+  EMUCPU_run();
+
+  TEST_ASSERT_UINT_EQ(cpuContext->pc, 3u);
+
+  cpuContext->pc = 0u;
+  cpuContext->flags[EMUCPU_ZERO_FLAG] = 1u;
+
+  EMUCPU_run();
+
+  TEST_ASSERT_UINT_EQ(cpuContext->pc, 2u);  
+}
+
 void EMUCPU_test(void)
 {
   EMUCPU_getContext((struct EMUCPU_Context**)&cpuContext);
@@ -132,4 +153,5 @@ void EMUCPU_test(void)
   TEST_CASE(EMUCPU_testXorA);
   TEST_CASE(EMUCPU_testLdHL);
   TEST_CASE(EMUCPU_testCbBit7H);
+  TEST_CASE(EMUCPU_testJRNZ);
 }

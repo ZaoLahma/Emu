@@ -34,6 +34,7 @@ static void handleLdSp(EMUCPU_Context* cpu);
 static void handleXorA(EMUCPU_Context* cpu);
 static void handleLdHL(EMUCPU_Context* cpu);
 static void handleLdDHLA(EMUCPU_Context* cpu);
+static void handleJRNZ(EMUCPU_Context* cpu);
 static void handleCb(EMUCPU_Context* cpu);
 
 static void handleCbBit7H(EMUCPU_Context* cpu);
@@ -107,13 +108,23 @@ static void handleLdHL(EMUCPU_Context* cpu)
 
 static void handleLdDHLA(EMUCPU_Context* cpu)
 {
-  uint16_t ramAddress = (cpu->h << BITS_IN_BYTE) | cpu->l;
-  DEBUG_LOG("ramAddress: 0x%x", ramAddress);
+  uint16_t ramAddress = ((cpu->h << BITS_IN_BYTE) | cpu->l);
+  DEBUG_LOG("ramAddress: 0x%X", ramAddress);
   cpu->ram[ramAddress] = cpu->a;
   ramAddress -= 1u;
   cpu->h = (uint8_t)((ramAddress & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
   cpu->l = (uint8_t)(ramAddress & UINT16_LOW_BYTE_MASK);
   cpu->pc += 1u;
+}
+
+static void handleJRNZ(EMUCPU_Context* cpu)
+{
+  if(0u == cpu->flags[EMUCPU_ZERO_FLAG])
+  {
+    int8_t jumpOffset = cpu->ram[cpu->pc + 1u];
+    cpu->pc += jumpOffset;
+  }
+  cpu->pc += 2u;
 }
 
 static void handleCb(EMUCPU_Context* cpu)
@@ -148,6 +159,7 @@ void EMUCPU_init(uint8_t* prog, uint16_t size)
 
   instructionTable[0x0].handle = handleNop;
   instructionTable[0x21].handle = handleLdHL;
+  instructionTable[0x20].handle = handleJRNZ;
   instructionTable[0x31].handle = handleLdSp;
   instructionTable[0x32].handle = handleLdDHLA;
   instructionTable[0xAF].handle = handleXorA;
@@ -159,7 +171,7 @@ void EMUCPU_init(uint8_t* prog, uint16_t size)
 void EMUCPU_run()
 {
   uint8_t op = cpu.ram[cpu.pc];
-  DEBUG_LOG("CPU handling op: 0x%X", op);
+  DEBUG_LOG("CPU handling op: 0x%X at address: 0x%x", op, cpu.pc);
   instructionTable[op].handle(&cpu);
   EMU_DEBUG_ASSERT_COND(cpu.stateOk);
 }
