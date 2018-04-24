@@ -11,13 +11,14 @@ static void EMUCPU_testLdSp(void);
 static void EMUCPU_testNop(void);
 static void EMUCPU_testXorA(void);
 static void EMUCPU_testLdHL(void);
+static void EMUCPU_testCbBit7H(void);
 
 static void EMUCPU_testInit(void)
 {
   uint8_t nop[] = {0x0};
 
   EMUCPU_init(nop, sizeof(nop));
-  
+
   TEST_ASSERT_INT_EQ(cpuContext->sp, 0xFFFEu);
   TEST_ASSERT_INT_EQ(cpuContext->pc, 0x0);
   TEST_ASSERT_INT_EQ(cpuContext->stateOk, true);
@@ -101,6 +102,26 @@ static void EMUCPU_testLdHL(void)
   TEST_ASSERT_UINT_EQ(cpuContext->l, expectedL);
 }
 
+static void EMUCPU_testCbBit7H(void)
+{
+  uint8_t cbBit7H[] = {0xCB, 0x7C};
+
+  EMUCPU_init(cbBit7H, sizeof(cbBit7H));
+
+  cpuContext->h = 0x40u;
+
+  EMUCPU_run();
+
+  TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], 1u);
+
+  cpuContext->pc = 0u;
+  cpuContext->h = 0x39u;
+
+  EMUCPU_run();
+
+  TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], 0u);
+}
+
 void EMUCPU_test(void)
 {
   EMUCPU_getContext((struct EMUCPU_Context**)&cpuContext);
@@ -110,4 +131,5 @@ void EMUCPU_test(void)
   TEST_CASE(EMUCPU_testNop);
   TEST_CASE(EMUCPU_testXorA);
   TEST_CASE(EMUCPU_testLdHL);
+  TEST_CASE(EMUCPU_testCbBit7H);
 }

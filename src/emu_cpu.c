@@ -10,7 +10,7 @@
 #define UINT16_LOW_BYTE_MASK  (0x00FFu)
 #define BITS_IN_BYTE          (8u)
 
-#define BIT_7                 (7u)
+#define BIT_7                 (6u)
 
 #define UNUSED_ARG(arg) \
 {\
@@ -127,7 +127,6 @@ static void handleCbBit7H(EMUCPU_Context* cpu)
 {
   uint8_t bit7 = ((cpu->h >> BIT_7) & 1u);
   cpu->flags[EMUCPU_ZERO_FLAG] = bit7;
-
   cpu->pc += 1u;
 }
 
