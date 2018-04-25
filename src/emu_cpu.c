@@ -101,19 +101,17 @@ static void handleXorA(EMUCPU_Context* cpu)
 static void handleLdHL(EMUCPU_Context* cpu)
 {
   uint16_t val = read16BitWord(&cpu->ram[cpu->pc + 1u]);
-  cpu->h = (uint8_t)((val & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
-  cpu->l = (uint8_t)(val & UINT16_LOW_BYTE_MASK);
+  cpu->hl.regValue = val;
   cpu->pc += 3u;
 }
 
 static void handleLdDHLA(EMUCPU_Context* cpu)
 {
-  uint16_t ramAddress = ((cpu->h << BITS_IN_BYTE) | cpu->l);
+  uint16_t ramAddress = cpu->hl.regValue;
   DEBUG_LOG_PRINTF("ramAddress: 0x%X", ramAddress);
   cpu->ram[ramAddress] = cpu->a;
   ramAddress -= 1u;
-  cpu->h = (uint8_t)((ramAddress & UINT16_HIGH_BYTE_MASK) >> BITS_IN_BYTE);
-  cpu->l = (uint8_t)(ramAddress & UINT16_LOW_BYTE_MASK);
+  cpu->hl.regValue = ramAddress;
   cpu->pc += 1u;
 }
 
@@ -136,7 +134,7 @@ static void handleCb(EMUCPU_Context* cpu)
 
 static void handleCbBit7H(EMUCPU_Context* cpu)
 {
-  uint8_t bit7 = ((cpu->h >> BIT_7) & 1u);
+  uint8_t bit7 = ((cpu->hl.high >> BIT_7) & 1u);
   cpu->flags[EMUCPU_ZERO_FLAG] = bit7;
   cpu->pc += 1u;
 }

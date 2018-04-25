@@ -12,6 +12,15 @@
 #define EMUCPU_HALF_CARRY_FLAG    (2u)
 #define EMUCPU_SUBTRACT_FLAG      (3u)
 
+union EMUCPU_Register
+{
+  uint16_t regValue;
+  struct
+  {
+    uint8_t low;
+    uint8_t high;
+  };
+};
 
 typedef struct
 {
@@ -19,13 +28,10 @@ typedef struct
   uint64_t cycles;
   uint16_t sp;
   uint16_t pc;
+  union EMUCPU_Register bc;
+  union EMUCPU_Register de;
+  union EMUCPU_Register hl;
   uint8_t  a;
-  uint8_t  b;
-  uint8_t  c;
-  uint8_t  d;
-  uint8_t  e;
-  uint8_t  h;
-  uint8_t  l;
   uint8_t  flags[EMUCPU_NUM_FLAGS];
   bool     stateOk;
 } EMUCPU_Context;

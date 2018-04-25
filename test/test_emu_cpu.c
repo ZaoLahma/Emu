@@ -3,6 +3,8 @@
 #include "test_emu_fwk.h"
 #include <string.h>
 
+#define BITS_IN_BYTE (8u)
+
 static EMUCPU_Context* cpuContext;
 
 static void EMUCPU_testInit(void);
@@ -99,8 +101,8 @@ static void EMUCPU_testLdHL(void)
 
   EMUCPU_run();
 
-  TEST_ASSERT_UINT_EQ(cpuContext->h, expectedH);
-  TEST_ASSERT_UINT_EQ(cpuContext->l, expectedL);
+  TEST_ASSERT_UINT_EQ(cpuContext->hl.high, expectedH);
+  TEST_ASSERT_UINT_EQ(cpuContext->hl.low,  expectedL);
 }
 
 static void EMUCPU_testCbBit7H(void)
@@ -109,14 +111,14 @@ static void EMUCPU_testCbBit7H(void)
 
   EMUCPU_init(cbBit7H, sizeof(cbBit7H));
 
-  cpuContext->h = 0x40u;
+  cpuContext->hl.regValue = (0x40u << BITS_IN_BYTE);
 
   EMUCPU_run();
 
   TEST_ASSERT_UINT_EQ(cpuContext->flags[EMUCPU_ZERO_FLAG], 1u);
 
   cpuContext->pc = 0u;
-  cpuContext->h = 0x39u;
+  cpuContext->hl.regValue = (0x39u << BITS_IN_BYTE);
 
   EMUCPU_run();
 
@@ -140,7 +142,7 @@ static void EMUCPU_testJRNZ(void)
 
   EMUCPU_run();
 
-  TEST_ASSERT_UINT_EQ(cpuContext->pc, 2u);  
+  TEST_ASSERT_UINT_EQ(cpuContext->pc, 2u);
 }
 
 void EMUCPU_test(void)
