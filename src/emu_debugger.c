@@ -32,11 +32,11 @@ static void parseCommand(void);
 
 static void showMenu(void)
 {
-  DEBUG_LOG("EMU DEBUGGER");
-  DEBUG_LOG("Set breakpoint: bp <address> (ex: bp 0x20)");
-  DEBUG_LOG("Run           : r")
-  DEBUG_LOG("Step          : s")
-  DEBUG_LOG("Quit          : q")
+  printf("EMU DEBUGGER" NEW_LINE);
+  printf("Set breakpoint: bp <address> (ex: bp 0x20)" NEW_LINE);
+  printf("Run           : r" NEW_LINE);
+  printf("Step          : s" NEW_LINE);
+  printf("Quit          : q" NEW_LINE);
 }
 
 void parseCommand(void)
@@ -78,7 +78,7 @@ void parseCommand(void)
 
   if(!validCommand)
   {
-    DEBUG_LOG_PRINTF("Command %s not valid", context.command);
+    printf("Command %s not valid" NEW_LINE, context.command);
   }
 
   (void) memset(context.command, 0u, sizeof(context.command));
@@ -98,10 +98,10 @@ void EMUDEBUGGER_run()
 {
   if(context.active)
   {
-    DEBUG_LOG_PRINTF("Next op: 0x%x at address 0x%x", context.cpuContext->ram[context.cpuContext->pc], context.cpuContext->pc);
+    printf("Next op: 0x%x at address 0x%x" NEW_LINE, context.cpuContext->ram[context.cpuContext->pc], context.cpuContext->pc);
     if(context.cpuContext->pc == context.breakpoint)
     {
-      DEBUG_LOG_PRINTF("Breakpoint reached at: 0x%X", context.cpuContext->pc);
+      printf("Breakpoint reached at: 0x%X" NEW_LINE, context.cpuContext->pc);
       context.stop = true;
     }
 

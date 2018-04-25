@@ -1,5 +1,6 @@
 CCOMMAND = clang
 CFLAGS = -Wall -c -Wextra -g
+DEBUGFLAGS = NONE
 LINKARGS = -lpthread -lsdl2
 SOURCES = $(wildcard src/*.c config/*.c)
 RELEASE_SOURCES = $(wildcard src/release/*.c)
@@ -11,7 +12,7 @@ INC_DIRS = -I./inc -I./config
 TEST_EXE_NAME = test_gameboy
 RELEASE_EXE_NAME = gameboy
 
-$(TEST_EXE_NAME): CFLAGS += -DDEBUG
+$(TEST_EXE_NAME): DEBUGFLAGS := -DDEBUG
 $(TEST_EXE_NAME): CFLAGS += --coverage
 $(TEST_EXE_NAME): LINKARGS += --coverage
 $(TEST_EXE_NAME): $(OBJECTS) $(TEST_OBJECTS)
@@ -24,7 +25,7 @@ $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 	$(CCOMMAND) $(OBJECTS) $(RELEASE_OBJECTS) $(LINKARGS) -o $(RELEASE_EXE_NAME)
 
 %.o: %.c
-	$(CCOMMAND) $(INC_DIRS) -c $(CFLAGS) $< -o $@
+	$(CCOMMAND) $(INC_DIRS) -c $(CFLAGS) $(DEBUGFLAGS) $< -o $@
 
 clean:
 	rm -f $(TEST_EXE_NAME) $(RELEASE_EXE_NAME) $(OBJECTS) $(TEST_OBJECTS) $(RELEASE_OBJECTS)

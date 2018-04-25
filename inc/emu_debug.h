@@ -4,16 +4,19 @@
 #include "emu.h"
 #include <stdio.h>
 
+#define NEW_LINE "\r\n"
+
 #ifdef DEBUG
 #define DEBUG_LOG(string) \
 {\
-  (void) printf(string "\n"); \
+  (void) printf(string NEW_LINE); \
 }
 #define DEBUG_LOG_PRINTF(stringPattern, ...) \
 {\
-  (void) printf(stringPattern "\n", __VA_ARGS__); \
+  (void) printf(stringPattern NEW_LINE, __VA_ARGS__); \
 }
 #else
+#define DEBUG_LOG(string)
 #define DEBUG_LOG_PRINTF(stringPattern, ...)
 #endif
 
