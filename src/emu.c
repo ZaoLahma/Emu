@@ -18,12 +18,12 @@ typedef struct
 
 static EMU_Context emuCtxt;
 
-void EMU_init(char* romPath)
+void EMU_init(char* romPath, bool debuggerActive)
 {
   emuCtxt.runTimeStatus = true;
   EMU_DEBUG_ASSERT_COND(EMUROM_OK == EMUROM_read(romPath, emuCtxt.romBuf, &emuCtxt.romSize));
   EMUCPU_init(emuCtxt.romBuf, emuCtxt.romSize);
-  EMUDEBUGGER_init();
+  EMUDEBUGGER_init(debuggerActive);
   EMUWIN_init();
 }
 
