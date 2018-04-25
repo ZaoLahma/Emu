@@ -54,7 +54,7 @@ static uint16_t read16BitWord(uint8_t* buf)
 static void illegalInstruction(EMUCPU_Context* cpu)
 {
   uint8_t op = cpu->ram[cpu->pc];
-  (void) printf("illegal instruction 0x%X at 0x%X\n", op, cpu->pc);
+  DEBUG_LOG_PRINTF("illegal instruction 0x%X at 0x%X\n", op, cpu->pc);
   UNUSED_ARG(cpu);
   cpu->stateOk = false;
 }

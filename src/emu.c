@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #define MAX_ROM_BYTE_SIZE (1000000u)
+#define FRAMERATE         (60u)
 
 typedef struct
 {

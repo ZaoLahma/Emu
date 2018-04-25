@@ -13,6 +13,7 @@
 #define RUN_CMD             "r"
 #define QUIT_CMD            "q"
 #define STEP_CMD            "s"
+#define DUMP_REGS_CMD       "d"
 
 typedef struct
 {
@@ -32,11 +33,13 @@ static void parseCommand(void);
 
 static void showMenu(void)
 {
-  printf("EMU DEBUGGER" NEW_LINE);
-  printf("Set breakpoint: bp <address> (ex: bp 0x20)" NEW_LINE);
-  printf("Run           : r" NEW_LINE);
-  printf("Step          : s" NEW_LINE);
-  printf("Quit          : q" NEW_LINE);
+  (void) printf("------- EMU DEBUGGER -------" NEW_LINE);
+  (void) printf("Set breakpoint: bp <address> (ex: bp 0x20)" NEW_LINE);
+  (void) printf("Dump CPU state: d" NEW_LINE);
+  (void) printf("Run           : r" NEW_LINE);
+  (void) printf("Step          : s" NEW_LINE);
+  (void) printf("Quit          : q" NEW_LINE);
+  (void) printf("$ ");
 }
 
 void parseCommand(void)
@@ -76,9 +79,28 @@ void parseCommand(void)
     validCommand = true;
   }
 
+  if(0u == memcmp(context.command, DUMP_REGS_CMD, strlen(DUMP_REGS_CMD)))
+  {
+    context.stop = true;
+    context.step = false;
+    validCommand = true;
+
+    (void) printf("------- CPU DUMP -------" NEW_LINE);
+    (void) printf("a: 0x%X" NEW_LINE, context.cpuContext->a);
+    (void) printf("zero flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_ZERO_FLAG]);
+    (void) printf("carry flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_CARRY_FLAG]);
+    (void) printf("half carry flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_HALF_CARRY_FLAG]);
+    (void) printf("subtract flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_SUBTRACT_FLAG]);
+    (void) printf("bc: 0x%X" NEW_LINE, context.cpuContext->bc.regValue);
+    (void) printf("de: 0x%X" NEW_LINE, context.cpuContext->de.regValue);
+    (void) printf("hl: 0x%X" NEW_LINE, context.cpuContext->hl.regValue);
+    (void) printf("sp: 0x%X" NEW_LINE, context.cpuContext->sp);
+    (void) printf("pc: 0x%X" NEW_LINE, context.cpuContext->pc);
+  }
+
   if(!validCommand)
   {
-    printf("Command %s not valid" NEW_LINE, context.command);
+    (void) printf("Command %s not valid" NEW_LINE, context.command);
   }
 
   (void) memset(context.command, 0u, sizeof(context.command));
@@ -98,10 +120,10 @@ void EMUDEBUGGER_run()
 {
   if(context.active)
   {
-    printf("Next op: 0x%x at address 0x%x" NEW_LINE, context.cpuContext->ram[context.cpuContext->pc], context.cpuContext->pc);
+    (void) printf("Next op: 0x%X at address 0x%X" NEW_LINE, context.cpuContext->ram[context.cpuContext->pc], context.cpuContext->pc);
     if(context.cpuContext->pc == context.breakpoint)
     {
-      printf("Breakpoint reached at: 0x%X" NEW_LINE, context.cpuContext->pc);
+      (void) printf("Breakpoint reached at: 0x%X" NEW_LINE, context.cpuContext->pc);
       context.stop = true;
     }
 
@@ -129,5 +151,6 @@ void EMUDEBUGGER_run()
 
       parseCommand();
     }
+    (void) printf("------- EXECUTE -------" NEW_LINE);
   }
 }
