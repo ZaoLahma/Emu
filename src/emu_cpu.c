@@ -22,11 +22,13 @@ typedef void (*EMUCPU_InstructionHandler)(EMUCPU_Context* cpu);
 typedef struct
 {
   EMUCPU_InstructionHandler handle;
+  char* name;
 } EMUCPU_Instruction;
 
 static uint16_t read16BitWord(uint8_t* buf);
 
 static void handleXor(EMUCPU_Context* cpu);
+static void handleLd(uint8_t* reg, EMUCPU_Context* cpu);
 
 static void illegalInstruction(EMUCPU_Context* cpu);
 static void handleNop(EMUCPU_Context* cpu);
@@ -36,6 +38,7 @@ static void handleLdHL(EMUCPU_Context* cpu);
 static void handleLdDHLA(EMUCPU_Context* cpu);
 static void handleJRNZ(EMUCPU_Context* cpu);
 static void handleCb(EMUCPU_Context* cpu);
+static void handleLdC(EMUCPU_Context* cpu);
 
 static void handleCbBit7H(EMUCPU_Context* cpu);
 
@@ -49,25 +52,6 @@ static uint16_t read16BitWord(uint8_t* buf)
   uint16_t retVal = buf[1u] << 8u | buf[0u];
   DEBUG_LOG_PRINTF("retVal: 0x%X", retVal);
   return (retVal);
-}
-
-static void illegalInstruction(EMUCPU_Context* cpu)
-{
-  uint8_t op = cpu->ram[cpu->pc];
-  UNUSED_ARG(op);
-  DEBUG_LOG_PRINTF("illegal instruction 0x%X at 0x%X\n", op, cpu->pc);
-  cpu->stateOk = false;
-}
-
-static void handleNop(EMUCPU_Context* cpu)
-{
-  cpu->pc += 1u;
-}
-
-static void handleLdSp(EMUCPU_Context* cpu)
-{
-  cpu->sp = read16BitWord(&cpu->ram[cpu->pc + 1u]);
-  cpu->pc += 3u;
 }
 
 static void handleXor(EMUCPU_Context* cpu)
@@ -90,6 +74,31 @@ static void handleXor(EMUCPU_Context* cpu)
   cpu->a ^= data;
   DEBUG_LOG_PRINTF("Data: %u, cpu->a: %u", data, cpu->a);
   cpu->pc += 1u;
+}
+
+static void handleLd(uint8_t* reg, EMUCPU_Context* cpu)
+{
+  *reg = cpu->ram[cpu->pc + 1u];
+  cpu->pc += 2u;
+}
+
+static void illegalInstruction(EMUCPU_Context* cpu)
+{
+  uint8_t op = cpu->ram[cpu->pc];
+  UNUSED_ARG(op);
+  DEBUG_LOG_PRINTF("illegal instruction 0x%X at 0x%X\n", op, cpu->pc);
+  cpu->stateOk = false;
+}
+
+static void handleNop(EMUCPU_Context* cpu)
+{
+  cpu->pc += 1u;
+}
+
+static void handleLdSp(EMUCPU_Context* cpu)
+{
+  cpu->sp = read16BitWord(&cpu->ram[cpu->pc + 1u]);
+  cpu->pc += 3u;
 }
 
 static void handleXorA(EMUCPU_Context* cpu)
@@ -132,6 +141,11 @@ static void handleCb(EMUCPU_Context* cpu)
   cbInstructionTable[cbOp].handle(cpu);
 }
 
+static void handleLdC(EMUCPU_Context* cpu)
+{
+  handleLd(&cpu->bc.low, cpu);
+}
+
 static void handleCbBit7H(EMUCPU_Context* cpu)
 {
   uint8_t bit7 = ((cpu->hl.high >> BIT_7) & 1u);
@@ -151,25 +165,26 @@ void EMUCPU_init(uint8_t* prog, uint16_t size)
 
   for(uint32_t i = 0; i < NUM_INSTRUCTIONS; ++i)
   {
-    instructionTable[i].handle = illegalInstruction;
-    cbInstructionTable[i].handle = illegalInstruction;
+    instructionTable[i] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IllegalInstruction"};
+    cbInstructionTable[i] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IllegalInstruction"};
   }
 
-  instructionTable[0x0].handle = handleNop;
-  instructionTable[0x21].handle = handleLdHL;
-  instructionTable[0x20].handle = handleJRNZ;
-  instructionTable[0x31].handle = handleLdSp;
-  instructionTable[0x32].handle = handleLdDHLA;
-  instructionTable[0xAF].handle = handleXorA;
-  instructionTable[0xCB].handle = handleCb;
+  instructionTable[0x00] = (EMUCPU_Instruction){.handle = handleNop,    .name = "NOP"};
+  instructionTable[0x0E] = (EMUCPU_Instruction){.handle = handleLdC,    .name = "LdC"};
+  instructionTable[0x20] = (EMUCPU_Instruction){.handle = handleJRNZ,   .name =  "JRNZ"};
+  instructionTable[0x21] = (EMUCPU_Instruction){.handle = handleLdHL,   .name = "LdHL"};
+  instructionTable[0x31] = (EMUCPU_Instruction){.handle = handleLdSp,   .name = "LdSP"};
+  instructionTable[0x32] = (EMUCPU_Instruction){.handle = handleLdDHLA, .name = "LdDHLA"};
+  instructionTable[0xAF] = (EMUCPU_Instruction){.handle = handleXorA,   .name = "XorA"};
+  instructionTable[0xCB] = (EMUCPU_Instruction){.handle = handleCb,     .name = "Cb"};
 
-  cbInstructionTable[0x7C].handle = handleCbBit7H;
+  cbInstructionTable[0x7C] = (EMUCPU_Instruction){.handle = handleCbBit7H, .name = "CbBit7H"};
 }
 
 void EMUCPU_run()
 {
   uint8_t op = cpu.ram[cpu.pc];
-  DEBUG_LOG_PRINTF("CPU handling op: 0x%X at address: 0x%x", op, cpu.pc);
+  DEBUG_LOG_PRINTF("CPU handling op: 0x%X (%s) at address: 0x%x", op, instructionTable[op].name, cpu.pc);
   instructionTable[op].handle(&cpu);
   EMU_DEBUG_ASSERT_COND(cpu.stateOk);
 }
@@ -177,4 +192,9 @@ void EMUCPU_run()
 void EMUCPU_getContext(struct EMUCPU_Context** context)
 {
   *context = (struct EMUCPU_Context*)&cpu;
+}
+
+char* EMUCPU_getOpName(uint8_t op)
+{
+  return instructionTable[op].name;
 }

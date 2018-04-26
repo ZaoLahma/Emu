@@ -1,5 +1,6 @@
 #include "emu_debugger.h"
 #include "emu_debug.h"
+#include "emu_cpu.h"
 #include "../test/test_emu_cpu.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -120,7 +121,8 @@ void EMUDEBUGGER_run()
 {
   if(context.active)
   {
-    (void) printf("Next op: 0x%X at address 0x%X" NEW_LINE, context.cpuContext->ram[context.cpuContext->pc], context.cpuContext->pc);
+    uint8_t op = context.cpuContext->ram[context.cpuContext->pc];
+    (void) printf("Next op: 0x%X (%s) at address 0x%X" NEW_LINE, op, EMUCPU_getOpName(op), context.cpuContext->pc);
     if(context.cpuContext->pc == context.breakpoint)
     {
       (void) printf("Breakpoint reached at: 0x%X" NEW_LINE, context.cpuContext->pc);
