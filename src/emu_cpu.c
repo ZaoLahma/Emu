@@ -169,14 +169,28 @@ void EMUCPU_init(uint8_t* prog, uint16_t size)
     cbInstructionTable[i] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IllegalInstruction"};
   }
 
-  instructionTable[0x00] = (EMUCPU_Instruction){.handle = handleNop,    .name = "NOP"};
-  instructionTable[0x0E] = (EMUCPU_Instruction){.handle = handleLdC,    .name = "LdC"};
-  instructionTable[0x20] = (EMUCPU_Instruction){.handle = handleJRNZ,   .name =  "JRNZ"};
-  instructionTable[0x21] = (EMUCPU_Instruction){.handle = handleLdHL,   .name = "LdHL"};
-  instructionTable[0x31] = (EMUCPU_Instruction){.handle = handleLdSp,   .name = "LdSP"};
-  instructionTable[0x32] = (EMUCPU_Instruction){.handle = handleLdDHLA, .name = "LdDHLA"};
-  instructionTable[0xAF] = (EMUCPU_Instruction){.handle = handleXorA,   .name = "XorA"};
-  instructionTable[0xCB] = (EMUCPU_Instruction){.handle = handleCb,     .name = "Cb"};
+  instructionTable[0x00] = (EMUCPU_Instruction){.handle = handleNop,          .name = "NOP"};
+  instructionTable[0x01] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdBC"};
+  instructionTable[0x02] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdBCA"};
+  instructionTable[0x03] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IncBC"};
+  instructionTable[0x04] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IncB"};
+  instructionTable[0x05] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "DecB"};
+  instructionTable[0x06] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdB"};
+  instructionTable[0x07] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "RLCA"};
+  instructionTable[0x08] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdNNSp"};
+  instructionTable[0x09] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "AddHLBC"};
+  instructionTable[0x0A] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdABC"};
+  instructionTable[0x0B] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "DecBC"};
+  instructionTable[0x0C] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "IncC"};
+  instructionTable[0x0D] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "DecC"};
+  instructionTable[0x0E] = (EMUCPU_Instruction){.handle = handleLdC,          .name = "RrCA"};
+  instructionTable[0x0F] = (EMUCPU_Instruction){.handle = illegalInstruction, .name = "LdB"};
+  instructionTable[0x20] = (EMUCPU_Instruction){.handle = handleJRNZ,         .name = "JRNZ"};
+  instructionTable[0x21] = (EMUCPU_Instruction){.handle = handleLdHL,         .name = "LdHL"};
+  instructionTable[0x31] = (EMUCPU_Instruction){.handle = handleLdSp,         .name = "LdSP"};
+  instructionTable[0x32] = (EMUCPU_Instruction){.handle = handleLdDHLA,       .name = "LdDHLA"};
+  instructionTable[0xAF] = (EMUCPU_Instruction){.handle = handleXorA,         .name = "XorA"};
+  instructionTable[0xCB] = (EMUCPU_Instruction){.handle = handleCb,           .name = "Cb"};
 
   cbInstructionTable[0x7C] = (EMUCPU_Instruction){.handle = handleCbBit7H, .name = "CbBit7H"};
 }
