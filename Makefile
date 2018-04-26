@@ -1,6 +1,6 @@
 CCOMMAND = clang
 CFLAGS = -Wall -c -Wextra -g
-DEBUGFLAGS = NONE
+DEBUGFLAGS = -DNONE
 LINKARGS = -lpthread -lsdl2
 SOURCES = $(wildcard src/*.c config/*.c)
 RELEASE_SOURCES = $(wildcard src/release/*.c)

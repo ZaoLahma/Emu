@@ -86,16 +86,16 @@ void parseCommand(void)
     validCommand = true;
 
     (void) printf("------- CPU DUMP -------" NEW_LINE);
-    (void) printf("a: 0x%X" NEW_LINE, context.cpuContext->a);
-    (void) printf("zero flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_ZERO_FLAG]);
-    (void) printf("carry flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_CARRY_FLAG]);
+    (void) printf("a:               0x%X" NEW_LINE, context.cpuContext->a);
+    (void) printf("zero flag:       0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_ZERO_FLAG]);
+    (void) printf("carry flag:      0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_CARRY_FLAG]);
     (void) printf("half carry flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_HALF_CARRY_FLAG]);
-    (void) printf("subtract flag: 0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_SUBTRACT_FLAG]);
-    (void) printf("bc: 0x%X" NEW_LINE, context.cpuContext->bc.regValue);
-    (void) printf("de: 0x%X" NEW_LINE, context.cpuContext->de.regValue);
-    (void) printf("hl: 0x%X" NEW_LINE, context.cpuContext->hl.regValue);
-    (void) printf("sp: 0x%X" NEW_LINE, context.cpuContext->sp);
-    (void) printf("pc: 0x%X" NEW_LINE, context.cpuContext->pc);
+    (void) printf("subtract flag:   0x%X" NEW_LINE, context.cpuContext->flags[EMUCPU_SUBTRACT_FLAG]);
+    (void) printf("bc:              0x%X" NEW_LINE, context.cpuContext->bc.regValue);
+    (void) printf("de:              0x%X" NEW_LINE, context.cpuContext->de.regValue);
+    (void) printf("hl:              0x%X" NEW_LINE, context.cpuContext->hl.regValue);
+    (void) printf("sp:              0x%X" NEW_LINE, context.cpuContext->sp);
+    (void) printf("pc:              0x%X" NEW_LINE, context.cpuContext->pc);
   }
 
   if(!validCommand)
