@@ -29,4 +29,4 @@ $(RELEASE_EXE_NAME): $(OBJECTS) $(RELEASE_OBJECTS)
 
 clean:
 	rm -f $(TEST_EXE_NAME) $(RELEASE_EXE_NAME) $(OBJECTS) $(TEST_OBJECTS) $(RELEASE_OBJECTS)
-	rm -f ./*.gc* ./src/*.gc* ./test/*.gc*
+	rm -f ./*.gc* ./config/*.gc* ./src/*.gc* ./test/*.gc*

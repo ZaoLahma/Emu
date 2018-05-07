@@ -23,10 +23,12 @@ static void handleLdSp(EMUCPU_Context* cpu);
 static void handleXorA(EMUCPU_Context* cpu);
 static void handleLdHL(EMUCPU_Context* cpu);
 static void handleLdDHLA(EMUCPU_Context* cpu);
+static void handleLdHLA(EMUCPU_Context* cpu);
 static void handleJRNZ(EMUCPU_Context* cpu);
 static void handleCb(EMUCPU_Context* cpu);
 static void handleLdC(EMUCPU_Context* cpu);
 static void handleLdA(EMUCPU_Context* cpu);
+static void handleLdCA(EMUCPU_Context* cpu);
 
 static void handleCbBit7H(EMUCPU_Context* cpu);
 
@@ -110,6 +112,15 @@ static void handleLdDHLA(EMUCPU_Context* cpu)
   cpu->pc += 1u;
 }
 
+static void handleLdHLA(EMUCPU_Context* cpu)
+{
+  uint16_t ramAddress = cpu->hl.regValue;
+  DEBUG_LOG_PRINTF("LdHLA ramAddress: 0x%X", ramAddress);
+  cpu->ram[ramAddress] = cpu->a;
+  cpu->cycles += 8u;
+  cpu->pc += 1u;
+}
+
 static void handleJRNZ(EMUCPU_Context* cpu)
 {
   if(0u == cpu->flags[EMUCPU_ZERO_FLAG])
@@ -135,6 +146,14 @@ static void handleLdC(EMUCPU_Context* cpu)
 static void handleLdA(EMUCPU_Context* cpu)
 {
   handleLd(&cpu->a, cpu);
+}
+
+static void handleLdCA(EMUCPU_Context* cpu)
+{
+  uint16_t ramAddress = cpu->bc.high;
+  DEBUG_LOG_PRINTF("LdCA: ramAddress: 0x%X", ramAddress);
+  cpu->ram[ramAddress] = cpu->a;
+  cpu->pc += 2u;
 }
 
 static void handleCbBit7H(EMUCPU_Context* cpu)
@@ -173,9 +192,11 @@ void EMUCPUCFG_init(void)
     instructionTable[0x21] = (EMUCPU_Instruction){.handle = handleLdHL,         .name = "LdHL"};
     instructionTable[0x31] = (EMUCPU_Instruction){.handle = handleLdSp,         .name = "LdSP"};
     instructionTable[0x32] = (EMUCPU_Instruction){.handle = handleLdDHLA,       .name = "LdDHLA"};
+    instructionTable[0x77] = (EMUCPU_Instruction){.handle = handleLdHLA,        .name = "LdHLA"};
     instructionTable[0x3E] = (EMUCPU_Instruction){.handle = handleLdA,          .name = "LdA"};
     instructionTable[0xAF] = (EMUCPU_Instruction){.handle = handleXorA,         .name = "XorA"};
     instructionTable[0xCB] = (EMUCPU_Instruction){.handle = handleCb,           .name = "Cb"};
+    instructionTable[0xE2] = (EMUCPU_Instruction){.handle = handleLdCA,         .name = "LdCA"};
 
     cbInstructionTable[0x7C] = (EMUCPU_Instruction){.handle = handleCbBit7H, .name = "CbBit7H"};
 }
