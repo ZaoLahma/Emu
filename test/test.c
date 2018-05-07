@@ -1,7 +1,7 @@
 #include "emu_cpu.h"
 #include "test_emu_fwk.h"
 #include "test_emu_rom.h"
-#include "test_emu_cpu.h"
+#include "test_emu_gameboy_cpu.h"
 #include <stdio.h>
 
 int main(void)

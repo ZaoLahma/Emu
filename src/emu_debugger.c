@@ -1,7 +1,7 @@
 #include "emu_debugger.h"
 #include "emu_debug.h"
 #include "emu_cpu.h"
-#include "../test/test_emu_cpu.h"
+#include "../test/test_emu_gameboy_cpu.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

@@ -1,5 +1,5 @@
-#ifndef HEADER_TEST_EMU_CPU
-#define HEADER_TEST_EMU_CPU
+#ifndef HEADER_TEST_EMU_GAMEBOY_CPU
+#define HEADER_TEST_EMU_GAMEBOY_CPU
 
 /*
   Function to be implemented by production
